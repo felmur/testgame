@@ -53,4 +53,9 @@ public class playerShip extends Thread {
     public int getWidth() {
         return width;
     }
+
+    public Rectangle getEdges() {
+        return new Rectangle(x, y, width, height);
+    }
+
 }

@@ -1,14 +1,9 @@
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class game extends Canvas implements Runnable, KeyListener, MouseMotionListener {
@@ -19,11 +14,21 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
     BufferedImage background;
     BufferedImage playership;
     BufferedImage playerbullet;
+    BufferedImage enemyship;
+    BufferedImage enemybullet;
+    ArrayList<BufferedImage> explosion = new ArrayList<>();
     Clip pbulletstart;
+    Clip ebulletstart;
+    Clip shipExplosion;
     private boolean gamerun = true;
     playerShip pship;
+    enemyShip eship;
+    JFrame w;
+
     ArrayList<playerBullet> pbullets = new ArrayList<playerBullet>();
+    ArrayList<playerBullet> pbulletsaux = new ArrayList<playerBullet>();
     private boolean pbullet_new = false;
+    Explosion exp = null;
 
 
     public game(){
@@ -31,6 +36,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         loadRes();
         Dimension dimension = new Dimension(width, height);
         JFrame win = new JFrame(prgname);
+        w = win;
         win.addKeyListener(this);
         win.setPreferredSize(dimension);
         win.setMaximumSize(dimension);
@@ -51,6 +57,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         realheight = win.getContentPane().getHeight()-5;
 
         this.addMouseMotionListener(this);
+        this.setFocusable(false);   // game is not focusable otherwise a simple mouse click disables the keylistener
+
         Thread tgame = new Thread(this);
         tgame.start();
     }
@@ -60,8 +68,14 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         background = loader.load("/images/backgrounds/darkPurple.png");
         playership = loader.load("/images/playerShip.png");
         playerbullet = loader.load("/images/playerBullet.png");
+        enemyship = loader.load("/images/enemyShip.png");
+        enemybullet = loader.load("/images/enemyBullet.png");
+        for (int i=1; i<5; i++) {
+            explosion.add(loader.load("/images/explosion/"+i+".png"));
+        }
         loaderClip loaderclip = new loaderClip();
         pbulletstart = loaderclip.load("/audio/laserPlayer.wav");
+        shipExplosion = loaderclip.load("/audio/shipExplosion.wav");
     }
 
     private void display() {
@@ -76,10 +90,24 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                 g.drawImage(background, w, h, 256, 256, this);
             }
         }
-        pship.display(g);
+        if (pship.isAlive()) pship.display(g);
+        if (eship.isAlive()) eship.display(g);
+
+        pbulletsaux.clear();
         for(playerBullet p : pbullets) {
-            if (p.isAlive()) p.display(g);
+            if (p.isAlive()) {
+                p.display(g);
+                if (mCollision.bulletVsEnemy(p,eship)) {
+                    log.d("Enemy Destroyed! You Win!");
+                    exp = new Explosion(explosion, shipExplosion, eship.getX(), eship.getY());
+                    exp.start();
+                    eship.setActive(false);
+                } else {
+                    pbulletsaux.add(p);
+                }
+            }
         }
+        pbullets = (ArrayList<playerBullet>)(pbulletsaux.clone());
         if (pbullet_new) {
             playerBullet p = new playerBullet(playerbullet, 100 + pship.getWidth(), pship.getY() + pship.getHeight() / 2, 54, 13, pbulletstart);
             p.start();
@@ -87,7 +115,9 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             p.display(g);
             pbullet_new = false;
         }
-
+        if (exp != null) {
+            if (exp.isAlive()) exp.display(g);
+        }
         g.dispose();
         buffer.show();
     }
@@ -97,6 +127,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         log.d("Game started");
         pship = new playerShip(playership,100, (realheight/2)-(99/2), 75,99);
         pship.start();
+        eship = new enemyShip(enemyship, width -100, (realheight/2)-(93/2), 84, 93);
+        eship.start();
         while(gamerun) {
             display();
         }
@@ -120,7 +152,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
     @Override
     public void keyTyped(KeyEvent keyEvent) { }
     @Override
-    public void keyReleased(KeyEvent keyEvent) { }
+    public void keyReleased(KeyEvent keyEvent) {  }
 
     public int getHeight() {
         return height;
@@ -136,13 +168,14 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
 
 
     @Override
-    public void mouseDragged(MouseEvent mouseEvent) {}
+    public void mouseDragged(MouseEvent mouseEvent) {
+    }
 
     @Override
     public void mouseMoved(MouseEvent mouseEvent) {
         int pos = mouseEvent.getPoint().y;
-        if (pos - pship.getHeight() < 0 ) pos = 0;
-        else if (pos + pship.getHeight() > realheight) pos = realheight-pship.getHeight();
+        if (pos + pship.getHeight() > realheight) pos = realheight-pship.getHeight();
         pship.setY(pos);
     }
+
 }

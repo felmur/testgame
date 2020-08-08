@@ -66,16 +66,8 @@ public class playerBullet extends Thread {
 //    }
 
 
-    public int getHeight() {
-        return height;
+    public Rectangle getEdges() {
+        return new Rectangle(x, y, width, height);
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }
