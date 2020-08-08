@@ -20,7 +20,7 @@ public class playerShip extends Thread {
     public void run() {
         active = true;
         while(active) {
-            utils.sleep(20);
+            utils.sleep(100);
         }
     }
 
@@ -36,6 +36,10 @@ public class playerShip extends Thread {
 
     public void display(Graphics g){
         g.drawImage(image, x, y, width, height, null);
+    }
+
+    public int getY() {
+        return y;
     }
 
     public void setY(int y) {

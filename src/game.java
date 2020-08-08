@@ -1,3 +1,5 @@
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -6,6 +8,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class game extends Canvas implements Runnable, KeyListener, MouseMotionListener {
     private static String prgname="TestGame";
@@ -14,8 +18,13 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
     private static int realheight;
     BufferedImage background;
     BufferedImage playership;
+    BufferedImage playerbullet;
+    Clip pbulletstart;
     private boolean gamerun = true;
     playerShip pship;
+    ArrayList<playerBullet> pbullets = new ArrayList<playerBullet>();
+    private boolean pbullet_new = false;
+
 
     public game(){
         log.d("Starting "+prgname+"...");
@@ -28,8 +37,16 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         win.setMinimumSize(dimension);
         win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         win.setResizable(false);
+
+        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+        win.getContentPane().setCursor(blankCursor);
+
         win.add(this);
         win.pack();
+
+        utils.sleep(1000);
+
         win.setVisible(true);
         realheight = win.getContentPane().getHeight()-5;
 
@@ -42,6 +59,9 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         loaderImg loader = new loaderImg();
         background = loader.load("/images/backgrounds/darkPurple.png");
         playership = loader.load("/images/playerShip.png");
+        playerbullet = loader.load("/images/playerBullet.png");
+        loaderClip loaderclip = new loaderClip();
+        pbulletstart = loaderclip.load("/audio/laserPlayer.wav");
     }
 
     private void display() {
@@ -57,6 +77,17 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             }
         }
         pship.display(g);
+        for(playerBullet p : pbullets) {
+            if (p.isAlive()) p.display(g);
+        }
+        if (pbullet_new) {
+            playerBullet p = new playerBullet(playerbullet, 100 + pship.getWidth(), pship.getY() + pship.getHeight() / 2, 54, 13, pbulletstart);
+            p.start();
+            pbullets.add(p);
+            p.display(g);
+            pbullet_new = false;
+        }
+
         g.dispose();
         buffer.show();
     }
@@ -79,6 +110,9 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                 break;
             case KeyEvent.VK_S:
                 pship.moveDown();
+                break;
+            case KeyEvent.VK_SPACE:
+                pbullet_new = true;
                 break;
         }
 
