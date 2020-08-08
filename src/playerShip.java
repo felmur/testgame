@@ -1,3 +1,11 @@
+/*
+     TESTGAME
+     A simple demo of a game written in java (8-openjdk)
+     (c) 2020 by Felice Murolo, Salerno, Italia
+     Email: linuxboy@giove_DOT_tk
+     Released under LGPL3 license
+     See LICENSE file for info
+*/
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -57,5 +65,4 @@ public class playerShip extends Thread {
     public Rectangle getEdges() {
         return new Rectangle(x, y, width, height);
     }
-
 }
