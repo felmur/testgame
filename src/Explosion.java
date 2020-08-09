@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Explosion extends Thread {
     private int x,y;
     ArrayList<BufferedImage> imgs;
-    BufferedImage image;
-    private int wait = 250;
+    BufferedImage image, previous;
+    private int wait = 200;
     private boolean active=false;
     Clip explosion;
 
@@ -25,6 +25,7 @@ public class Explosion extends Thread {
         this.imgs = (ArrayList<BufferedImage>) (imgs.clone());
         this. explosion = explosion;
         image = imgs.get(0);
+        previous = image;
     }
 
     @Override
@@ -33,7 +34,11 @@ public class Explosion extends Thread {
         playSnd();
         for(BufferedImage img : imgs) {
             image = img;
+            int sp = (image.getHeight()-previous.getHeight())/2;
+            y = y - sp;
+            x = x - sp;
             utils.sleep(wait);
+            previous = image;
         }
     }
 

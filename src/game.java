@@ -138,7 +138,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         log.d("Game started");
         pship = new playerShip(playership,100, (realheight/2)-(99/2), 75,99);
         pship.start();
-        eship = new enemyShip(enemyship, width -100, (realheight/2)-(93/2), 84, 93);
+        eship = new enemyShip(enemyship, width -150, (realheight/2)-(93/2), 84, 93);
         eship.start();
         while(gamerun) {
             display();
