@@ -13,6 +13,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class game extends Canvas implements Runnable, KeyListener, MouseMotionListener {
@@ -38,6 +41,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
     ArrayList<playerBullet> pbulletsaux = new ArrayList<playerBullet>();
     private boolean pbullet_new = false;
     Explosion exp = null;
+    Font myfont = null;
+    boolean gamewin = false, gamelose = false;
 
 
     public game(){
@@ -85,6 +90,17 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         loaderClip loaderclip = new loaderClip();
         pbulletstart = loaderclip.load("/audio/laserPlayer.wav");
         shipExplosion = loaderclip.load("/audio/shipExplosion.wav");
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        URL u = getClass().getResource("/fonts/kenvector_future_thin.ttf");
+        try {
+            myfont = Font.createFont(Font.TRUETYPE_FONT, new File(u.getPath()));
+            ge.registerFont(myfont);
+        } catch (FontFormatException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void display() {
@@ -113,6 +129,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                     exp.start();
                     eship.setActive(false);
                     pship.setActive(false);
+                    gamewin = true;
                 } else {
                     pbulletsaux.add(p);
                 }
@@ -129,6 +146,9 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         if (exp != null) {
             if (exp.isAlive()) exp.display(g);
         }
+        if (gamewin) utils.printCenter("YOU WIN!", g, Color.orange);
+        else if (gamelose) utils.printCenter("YOU LOSE!", g, Color.red);
+
         g.dispose();
         buffer.show();
     }
@@ -189,4 +209,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         pship.setY(pos);
     }
 
+    public Font getMyfont() {
+        return myfont;
+    }
 }
