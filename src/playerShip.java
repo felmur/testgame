@@ -65,4 +65,8 @@ public class playerShip extends Thread {
     public Rectangle getEdges() {
         return new Rectangle(x, y, width, height);
     }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

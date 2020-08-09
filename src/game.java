@@ -107,10 +107,12 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             if (p.isAlive()) {
                 p.display(g);
                 if (mCollision.bulletVsEnemy(p,eship)) {
+                    // PLAYER WIN
                     log.d("Enemy Destroyed! You Win!");
                     exp = new Explosion(explosion, shipExplosion, eship.getX(), eship.getY());
                     exp.start();
                     eship.setActive(false);
+                    pship.setActive(false);
                 } else {
                     pbulletsaux.add(p);
                 }
@@ -153,7 +155,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                 pship.moveDown();
                 break;
             case KeyEvent.VK_SPACE:
-                pbullet_new = true;
+                if (eship.isAlive()) pbullet_new = true;
                 break;
         }
 
