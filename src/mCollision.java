@@ -15,5 +15,12 @@ public class mCollision {
         }
         return ret;
     }
+    public static boolean bulletVsPlayer(enemyBullet ebullet, playerShip pship) {
+        boolean ret = false;
+        if (pship.isAlive() && ebullet.isAlive()) {
+            ret = ebullet.getEdges().intersects(pship.getEdges());
+        }
+        return ret;
+    }
 
 }

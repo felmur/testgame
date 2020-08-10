@@ -39,6 +39,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
 
     ArrayList<playerBullet> pbullets = new ArrayList<playerBullet>();
     ArrayList<playerBullet> pbulletsaux = new ArrayList<playerBullet>();
+    ArrayList<enemyBullet> ebullets = new ArrayList<enemyBullet>();
+    ArrayList<enemyBullet> ebulletsaux = new ArrayList<enemyBullet>();
     private boolean pbullet_new = false;
     Explosion exp = null;
     Font myfont = null;
@@ -89,6 +91,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         }
         loaderClip loaderclip = new loaderClip();
         pbulletstart = loaderclip.load("/audio/laserPlayer.wav");
+        ebulletstart = loaderclip.load("/audio/laserEnemy.wav");
         shipExplosion = loaderclip.load("/audio/shipExplosion.wav");
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -136,6 +139,26 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             }
         }
         pbullets = (ArrayList<playerBullet>)(pbulletsaux.clone());
+
+        ebulletsaux.clear();
+        for(enemyBullet p : ebullets) {
+            if (p.isAlive()) {
+                p.display(g);
+                if (mCollision.bulletVsPlayer(p,pship)) {
+                    // PLAYER LOSE
+                    log.d("Player Destroyed! You Lose.");
+                    exp = new Explosion(explosion, shipExplosion, pship.getX(), pship.getY());
+                    exp.start();
+                    eship.setActive(false);
+                    pship.setActive(false);
+                    gamelose = true;
+                } else {
+                    ebulletsaux.add(p);
+                }
+            }
+        }
+        ebullets = (ArrayList<enemyBullet>)(ebulletsaux.clone());
+
         if (pbullet_new) {
             playerBullet p = new playerBullet(playerbullet, 100 + pship.getWidth(), pship.getY() + pship.getHeight() / 2, 54, 13, pbulletstart);
             p.start();
@@ -143,6 +166,13 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             p.display(g);
             pbullet_new = false;
         }
+        if (eship.isAlive() && eship.isFiring()) {
+            enemyBullet e = new enemyBullet(enemybullet, width -150, eship.getY() + eship.getHeight() / 2, 54, 13, ebulletstart);
+            e.start();
+            ebullets.add(e);
+            e.display(g);
+        }
+
         if (exp != null) {
             if (exp.isAlive()) exp.display(g);
         }

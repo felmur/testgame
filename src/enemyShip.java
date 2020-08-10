@@ -16,6 +16,7 @@ public class enemyShip extends Thread {
     private boolean active;
     private int speed = 2;
     private int wait = 500;
+    private int k = 0;
     Random rnd;
 
     public enemyShip(BufferedImage image, int x, int y, int width, int height) {
@@ -66,12 +67,32 @@ public class enemyShip extends Thread {
         this.y = y;
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
 
     public Rectangle getEdges() {
         return new Rectangle(x, y, width, height);
+    }
+
+    public boolean isFiring(){
+        boolean ret = false;
+        int r = rnd.nextInt(100000);
+
+        if (r>99970) {
+            ret = true;
+            k++;
+            log.d(k);
+        }
+        return (ret);
     }
 
 }
