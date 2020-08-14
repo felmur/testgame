@@ -26,6 +26,7 @@ public class Explosion extends Thread {
         this. explosion = explosion;
         image = imgs.get(0);
         previous = image;
+        start();
     }
 
     @Override

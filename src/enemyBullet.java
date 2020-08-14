@@ -27,6 +27,7 @@ public class enemyBullet extends Thread {
         this.image = image;
         this.startSound = startSound;
         this.active = true;
+        start();
     }
 
     @Override

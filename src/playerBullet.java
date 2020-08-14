@@ -27,6 +27,7 @@ public class playerBullet extends Thread {
         this.image = image;
         this.startSound = startSound;
         this.active = true;
+        start();
     }
 
     @Override

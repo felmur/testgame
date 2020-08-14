@@ -22,6 +22,7 @@ public class playerShip extends Thread {
         this.height = height;
         this.image = image;
         this.active = true;
+        start();
     }
 
     @Override

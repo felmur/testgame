@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.TimerTask;
+import java.util.Timer;
 
 public class game extends Canvas implements Runnable, KeyListener, MouseMotionListener {
     private static String prgname="TestGame";
@@ -67,8 +69,6 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         win.add(this);
         win.pack();
 
-        utils.sleep(1000);
-
         win.setVisible(true);
         realheight = win.getContentPane().getHeight()-5;
 
@@ -113,8 +113,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             return;
         }
         Graphics g = buffer.getDrawGraphics();
-        for (int h=0; h<height; h+=256) {
-            for (int w=0; w<width; w+=256) {
+        for (int h = 0; h < height; h += 256) {
+            for (int w = 0; w < width; w += 256) {
                 g.drawImage(background, w, h, 256, 256, this);
             }
         }
@@ -122,53 +122,51 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         if (eship.isAlive()) eship.display(g);
 
         pbulletsaux.clear();
-        for(playerBullet p : pbullets) {
+        for (playerBullet p : pbullets) {
             if (p.isAlive()) {
                 p.display(g);
-                if (mCollision.bulletVsEnemy(p,eship)) {
+                if (mCollision.bulletVsEnemy(p, eship)) {
                     // PLAYER WIN
                     log.d("Enemy Destroyed! You Win!");
                     exp = new Explosion(explosion, shipExplosion, eship.getX(), eship.getY());
-                    exp.start();
                     eship.setActive(false);
                     pship.setActive(false);
                     gamewin = true;
+                    endRound();
                 } else {
                     pbulletsaux.add(p);
                 }
             }
         }
-        pbullets = (ArrayList<playerBullet>)(pbulletsaux.clone());
+        pbullets = (ArrayList<playerBullet>) (pbulletsaux.clone());
 
         ebulletsaux.clear();
-        for(enemyBullet p : ebullets) {
+        for (enemyBullet p : ebullets) {
             if (p.isAlive()) {
                 p.display(g);
-                if (mCollision.bulletVsPlayer(p,pship)) {
+                if (mCollision.bulletVsPlayer(p, pship)) {
                     // PLAYER LOSE
                     log.d("Player Destroyed! You Lose.");
                     exp = new Explosion(explosion, shipExplosion, pship.getX(), pship.getY());
-                    exp.start();
                     eship.setActive(false);
                     pship.setActive(false);
                     gamelose = true;
+                    endRound();
                 } else {
                     ebulletsaux.add(p);
                 }
             }
         }
-        ebullets = (ArrayList<enemyBullet>)(ebulletsaux.clone());
+        ebullets = (ArrayList<enemyBullet>) (ebulletsaux.clone());
 
         if (pbullet_new) {
             playerBullet p = new playerBullet(playerbullet, 100 + pship.getWidth(), pship.getY() + pship.getHeight() / 2, 54, 13, pbulletstart);
-            p.start();
             pbullets.add(p);
             p.display(g);
             pbullet_new = false;
         }
         if (eship.isAlive() && eship.isFiring()) {
-            enemyBullet e = new enemyBullet(enemybullet, width -150, eship.getY() + eship.getHeight() / 2, 54, 13, ebulletstart);
-            e.start();
+            enemyBullet e = new enemyBullet(enemybullet, width - 150, eship.getY() + eship.getHeight() / 2, 54, 13, ebulletstart);
             ebullets.add(e);
             e.display(g);
         }
@@ -176,22 +174,46 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         if (exp != null) {
             if (exp.isAlive()) exp.display(g);
         }
-        if (gamewin) utils.printCenter("YOU WIN!", g, Color.orange);
-        else if (gamelose) utils.printCenter("YOU LOSE!", g, Color.red);
+        if (gamewin) {
+            utils.printCenter("YOU WIN!", g, Color.orange);
+        } else if (gamelose) {
+            utils.printCenter("YOU LOSE!", g, Color.red);
+        }
 
         g.dispose();
         buffer.show();
     }
 
+    private void endRound(){
+        final Timer timer;
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            int n = 0;
+            @Override
+            public void run() {
+                System.out.println(n);
+                if (++n == 5) {
+                    gamerun = false;
+                    timer.cancel();
+                }
+            }
+        },1000,1000);
+    }
+
     @Override
     public void run() {
         log.d("Game started");
-        pship = new playerShip(playership,100, (realheight/2)-(99/2), 75,99);
-        pship.start();
-        eship = new enemyShip(enemyship, width -150, (realheight/2)-(93/2), 84, 93);
-        eship.start();
-        while(gamerun) {
-            display();
+        while(true) {
+            log.d("Round begins");
+            pship = new playerShip(playership, 100, (realheight / 2) - (99 / 2), 75, 99);
+            eship = new enemyShip(enemyship, width - 150, (realheight / 2) - (93 / 2), 84, 93);
+            utils.sleep(500);
+            gamerun = true;
+            gamewin = false;
+            gamelose = false;
+            while (gamerun) {
+                display();
+            }
         }
     }
 

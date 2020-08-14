@@ -26,6 +26,7 @@ public class enemyShip extends Thread {
         this.height = height;
         this.image = image;
         this.active = true;
+        start();
     }
 
     @Override
@@ -86,11 +87,10 @@ public class enemyShip extends Thread {
     public boolean isFiring(){
         boolean ret = false;
         int r = rnd.nextInt(100000);
-
         if (r>99970) {
             ret = true;
             k++;
-            log.d(k);
+            //log.d(k);
         }
         return (ret);
     }
