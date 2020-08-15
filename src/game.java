@@ -25,6 +25,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
     private static int width=1280;
     private static int height=720;
     private static int realheight;
+    private int pointplayer=0;
+    private int pointenemy=0;
     BufferedImage background;
     BufferedImage playership;
     BufferedImage playerbullet;
@@ -125,7 +127,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         for (playerBullet p : pbullets) {
             if (p.isAlive()) {
                 p.display(g);
-                if (mCollision.bulletVsEnemy(p, eship)) {
+                if (mCollision.bulletVsEnemy(p, eship) && !gamelose) {
                     // PLAYER WIN
                     log.d("Enemy Destroyed! You Win!");
                     exp = new Explosion(explosion, shipExplosion, eship.getX(), eship.getY());
@@ -133,6 +135,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                     pship.setActive(false);
                     gamewin = true;
                     endRound();
+                    pointplayer++;
                 } else {
                     pbulletsaux.add(p);
                 }
@@ -144,7 +147,7 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         for (enemyBullet p : ebullets) {
             if (p.isAlive()) {
                 p.display(g);
-                if (mCollision.bulletVsPlayer(p, pship)) {
+                if (mCollision.bulletVsPlayer(p, pship) && !gamewin) {
                     // PLAYER LOSE
                     log.d("Player Destroyed! You Lose.");
                     exp = new Explosion(explosion, shipExplosion, pship.getX(), pship.getY());
@@ -152,12 +155,15 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
                     pship.setActive(false);
                     gamelose = true;
                     endRound();
+                    pointenemy++;
                 } else {
                     ebulletsaux.add(p);
                 }
             }
         }
         ebullets = (ArrayList<enemyBullet>) (ebulletsaux.clone());
+
+        if (!gamewin && !gamelose) utils.printScore(Integer.toString(pointplayer)+":"+Integer.toString(pointenemy), g, Color.green);
 
         if (pbullet_new) {
             playerBullet p = new playerBullet(playerbullet, 100 + pship.getWidth(), pship.getY() + pship.getHeight() / 2, 54, 13, pbulletstart);
@@ -180,6 +186,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
             utils.printCenter("YOU LOSE!", g, Color.red);
         }
 
+
+
         g.dispose();
         buffer.show();
     }
@@ -188,11 +196,11 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         final Timer timer;
         timer = new Timer();
         timer.schedule(new TimerTask() {
-            int n = 0;
+            int n = 5;
             @Override
             public void run() {
                 System.out.println(n);
-                if (++n == 5) {
+                if (--n == 0) {
                     gamerun = false;
                     timer.cancel();
                 }
