@@ -97,9 +97,8 @@ public class game extends Canvas implements Runnable, KeyListener, MouseMotionLi
         shipExplosion = loaderclip.load("/audio/shipExplosion.wav");
 
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        URL u = getClass().getResource("/fonts/kenvector_future_thin.ttf");
         try {
-            myfont = Font.createFont(Font.TRUETYPE_FONT, new File(u.getPath()));
+            myfont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/kenvector_future_thin.ttf"));
             ge.registerFont(myfont);
         } catch (FontFormatException e) {
             e.printStackTrace();

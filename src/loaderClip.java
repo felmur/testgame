@@ -7,6 +7,7 @@
      See LICENSE file for info
 */
 import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 
 public class loaderClip {
@@ -15,7 +16,7 @@ public class loaderClip {
         Clip clip = null;
 
         try {
-            AudioInputStream audio = AudioSystem.getAudioInputStream(getClass().getResourceAsStream(path));
+            AudioInputStream audio = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass().getResourceAsStream(path)));
             clip = AudioSystem.getClip();
             clip.open(audio);
             log.d("Audio: '"+path+"' loaded successfully");
