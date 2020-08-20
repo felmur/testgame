@@ -14,8 +14,7 @@ public class enemyBullet extends Thread {
     private int x,y,width,height;
     BufferedImage image;
     private boolean active;
-    private int speed = 1;
-    private int delayspeed = 3;
+    private int speed = 3;
     private int k=0;
     private static Clip startSound;
 
@@ -35,18 +34,14 @@ public class enemyBullet extends Thread {
         playSnd();
         active = true;
         while(active) {
-            utils.sleep(100);
+            x-=speed;
+            if (x<0) active = false;
+            utils.sleep(2);
         }
     }
 
     public void display(Graphics g){
         g.drawImage(image, x, y, width, height, null);
-        k++;
-        if (k == delayspeed) {
-            x-=speed;
-            if (x<0) active = false;
-            k=0;
-        }
     }
 
     public void playSnd(){
