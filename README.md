@@ -15,3 +15,11 @@
 
 Written with Intellij Idea, version 2020.1, and Java-8-OpenJDK.
 
+# DOWNLOAD EXECUTABLE
+Please, check out /out/artifacts/ directory for last jar executable or click here:
+
+https://github.com/felmur/testgame/blob/master/out/artifacts/testgame.jar
+
+
+
+Run it with 'java --jar testgame.jar'.
